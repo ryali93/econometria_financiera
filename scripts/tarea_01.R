@@ -13,7 +13,7 @@ getSymbols.yahoo('TSLA', env = globalenv(), return.class = "xts", from = '2002-0
 View(TSLA)
 chartSeries(TSLA$TSLA.Close, theme="black")
 
-# Ejercicio Nivel 1 - 02
+# Ejercicio Nivel 1 - 03
 getSymbols.yahoo('AAPL', env = globalenv(), return.class = "xts", from = '2002-01-01', to=Sys.Date(), periodicity = 'daily')
 chartSeries(AAPL, theme="black")
 
@@ -26,16 +26,15 @@ addTA(AAPL_Ret, on=NA, col = "darkgreen", legend="Retorno")
 
 
 # Ejercicio Nivel 2 - 01
-getSymbols.yahoo("KO", env = globalenv(), return.class = "xts", from = '2019-10-14', to=Sys.Date())
-getSymbols.yahoo("DAX", env = globalenv(), return.class = "xts", from = '2019-10-14', to=Sys.Date())
+getSymbols.yahoo("KO", env = globalenv(), return.class = "xts", from = '2019-01-01', to=Sys.Date())
+getSymbols.yahoo("DAX", env = globalenv(), return.class = "xts", from = '2019-01-01', to=Sys.Date())
 getFX("EUR/USD")
-summary(EURUSD)
 
 KO_Ret = Return.calculate(KO$KO.Close, method = "compound")
 DAX_Ret = Return.calculate(DAX$DAX.Close, method = "compound")
 EURUSD_Ret = Return.calculate(EURUSD, method = "compound")
 
-chartSeries(KO$KO.Close, theme = "black")
+chartSeries(KO, theme = "black")
 addTA(DAX)
 addTA(EURUSD)
 
@@ -44,18 +43,25 @@ addTA(DAX_Ret)
 addTA(EURUSD_Ret)
 
 # Verificando la presencia de raiz unitaria
-adf.test(diff(KO$KO.Close)[-1], alternative = "stationary")$p.value # p-value > 0.05: tiene RU
-adf.test(diff(DAX$DAX.Close)[-1], alternative = "stationary")$p.value # p-value > 0.05: tiene RU
+adf.test(diff(KO$KO.Close)[-1], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
+adf.test(diff(DAX$DAX.Close)[-1], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
 adf.test(diff(EURUSD)[-1], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
 
 adf.test(diff(KO_Ret[-1,])[-1,], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
 adf.test(diff(DAX_Ret[-1,])[-1,], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
 adf.test(diff(EURUSD_Ret[-1,])[-1,], alternative = "stationary")$p.value # p-value < 0.05: no tiene RU
 
-
 # Ejercicio Nivel 3 - 01
+USDPEN <- read.csv("E:/2020/econometria/data/Diarias-20200412-124109.csv", sep = ",")
+USDPEN$Fecha = as.POSIXct(USDPEN$Fecha, format="%d/%m/%Y")
+USDPEN = xts(USDPEN$USDPEN, USDPEN$Fecha)
+chartSeries(USDPEN, theme="black")
+
+#_______________________________________________________________________________
 
 
 
 
 
+library(urca)
+ur.df(EURUSD_Ret[-1,], type=c("trend"), selectlags = c("BIC"))
